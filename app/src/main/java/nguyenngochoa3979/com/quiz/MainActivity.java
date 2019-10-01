@@ -2,7 +2,9 @@ package nguyenngochoa3979.com.quiz;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,8 +15,11 @@ public class MainActivity extends AppCompatActivity {
     private Button mFalseButton;
     private Button mNextButton;
     private Button mPreviewButton;
+    private Button mCheatButton;
     private TextView mQuestionTextView;
     private int mCurrent = 0;
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_oceans, true),
@@ -43,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_main);
+
         mQuestionTextView = (TextView) findViewById(R.id.question_textview);
         //int question = mQuestionBank[mCurrent].getTextResId();
         //mQuestionTextView.setText(questio
@@ -86,8 +93,51 @@ public class MainActivity extends AppCompatActivity {
                 updateQuestion();
             }
         });
-
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //start cheat activity
+                boolean answerIsTrue = mQuestionBank[mCurrent].isAnswerTrue();
+                Intent i = CheatActivity.newIntent(MainActivity.this,answerIsTrue);
+                startActivity(i);
+            }
+        });
+        if(savedInstanceState != null){
+            mCurrent = savedInstanceState.getInt(KEY_INDEX,0);
+        }
         updateQuestion();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle saveInstanceState) {
+
+        super.onSaveInstanceState(saveInstanceState);
+
+        Log.i(TAG, "onSaveInstanceState");
+        saveInstanceState.putInt(KEY_INDEX, mCurrent);
+    }
+
+    public void OnStart(){
+        super.onStart();
+        Log.d(TAG, "onStart() called");
+    }
+    public void OnPause()
+    {
+        super.onPause();
+        Log.d(TAG, "onPause() called");
+    }
+    public void OnResume(){
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+    }
+    public void OnStop(){
+        super.onStop();
+        Log.d(TAG, "onStop() called");
+    }
+    public void Destroy(){
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
     }
 }

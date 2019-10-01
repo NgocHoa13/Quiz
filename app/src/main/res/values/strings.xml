@@ -11,4 +11,8 @@
     <string name="correct_toast">Correct</string>
     <string name="incorrect_toast">Incorrect</string>
     <string name="preview_button">Preview</string>
+    <string name="warning_text">warning</string>
+    <string name="Answer">Answer</string>
+    <string name="Show_answer_button">Answer</string>
+    <string name="cheat_buttonn">Cheat</string>
 </resources>
