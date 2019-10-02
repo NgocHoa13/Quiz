@@ -2,6 +2,7 @@ package nguyenngochoa3979.com.quiz;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     private int mCurrent = 0;
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final int REQUEST_CODE_CHEAT = 0;
+    private boolean mIsCheater;
 
     private Question[] mQuestionBank = new Question[] {
             new Question(R.string.question_oceans, true),
@@ -35,11 +38,19 @@ public class MainActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrent].isAnswerTrue();
         int messageResId = 0;
-        if (userPressedTrue == answerIsTrue) {
-            messageResId = R.string.correct_toast;
+
+        if(mIsCheater)
+        {
+            messageResId = R.string.judgment_toast;
         }
         else {
-            messageResId = R.string.incorrect_toast;
+
+
+            if (userPressedTrue == answerIsTrue) {
+                messageResId = R.string.correct_toast;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
@@ -59,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mCurrent = (mCurrent + 1)%mQuestionBank.length;
                 updateQuestion();
+
             }
         });
 
@@ -83,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mCurrent = (mCurrent + 1) % mQuestionBank.length;
                 updateQuestion();
+                mIsCheater = false;
             }
         });
         mPreviewButton = (Button) findViewById(R.id.preview_button);
@@ -93,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 updateQuestion();
             }
         });
+
         mCheatButton = (Button) findViewById(R.id.cheat_button);
         mCheatButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,14 +114,31 @@ public class MainActivity extends AppCompatActivity {
                 //start cheat activity
                 boolean answerIsTrue = mQuestionBank[mCurrent].isAnswerTrue();
                 Intent i = CheatActivity.newIntent(MainActivity.this,answerIsTrue);
-                startActivity(i);
+                startActivityForResult(i, REQUEST_CODE_CHEAT);
+
             }
         });
         if(savedInstanceState != null){
             mCurrent = savedInstanceState.getInt(KEY_INDEX,0);
         }
+
         updateQuestion();
 
+    }
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null)
+            {
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+
+        }
     }
 
     @Override
@@ -118,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         saveInstanceState.putInt(KEY_INDEX, mCurrent);
     }
+
+
 
     public void OnStart(){
         super.onStart();
